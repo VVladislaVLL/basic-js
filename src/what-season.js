@@ -1,9 +1,16 @@
 const CustomError = require("../extensions/custom-error");
 
 module.exports = function getSeason(date) {
-    if (date == undefined) return 'Unable to determine the time of year!';
+    if (date === undefined) return 'Unable to determine the time of year!';
     if (typeof date != 'object') throw Error;
-    if (date instanceof Date && date == 'Invalid Date') throw Error; //return null;
+    if (date instanceof Date && date == 'Invalid Date') throw Error;
+    try {
+      date.getTimezoneOffset();
+    }
+    catch (TypeError) {
+      console.log("Error");
+      throw Error;
+    }
     let month = date.getMonth();
     switch (month) {
       case 0:
