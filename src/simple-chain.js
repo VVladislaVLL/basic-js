@@ -15,9 +15,19 @@ const chainMaker = {
     return this;
   },
   removeLink(position) {
-    if (isNaN(+(position - 1))) throw Error;
-    if (position >= this.chain.length || position - 1 < 0) throw Error;
-    if (!Number.isInteger(position)) throw Error;
+    if (isNaN(+(position - 1))) {
+      this.chain = [];
+      throw Error;
+    }
+    if (position >= this.chain.length || position - 1 < 0) {
+      this.chain = [];
+      throw Error;
+    }
+    if (!Number.isInteger(position)) {
+      this.chain = [];
+      throw Error;
+    }
+      
     this.chain.splice(position - 1,1);
     return this;
   },
@@ -27,6 +37,7 @@ const chainMaker = {
   },
   finishChain() {
     let result = this.chain.join('~~');
+    console.log(this.chain);
     this.chain = [];
     return result;
   }
