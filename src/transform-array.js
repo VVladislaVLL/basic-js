@@ -1,61 +1,84 @@
 const CustomError = require("../extensions/custom-error");
 
-module.exports = function transform(arr) {
+module.exports = function transform(arr123) {
+  const clone = (items) => items.map(item => Array.isArray(item) ? clone(item) : item);
+  let arr = clone(arr123)
+
   let discard_next = (array, i, set) => {
     if (array[i + 1] != undefined) {
       if (!set.has(array[i + 1])) {
         array[i]  = '--';
         array[i + 1]  = '--';
+        return i + 2;
       }
       else {
-      array.splice(i, 1);
+        array.splice(i, 1);
+        return i;
       }
     }
     else {
       array.splice(i, 1);
+      return i;
     }
+    return i;
   }
+
   let discard_prev = (array, i,set) => {
     if (array[i - 1] != undefined) {
       if (!set.has(array[i - 1])) {
-      array[i - 1]  = '--';
-      array[i]  = '--';
+        array[i - 1]  = '--';
+        array[i]  = '--';
+        return i + 1;
       }
       else {
       array.splice(i, 1);
+      return i;
       }
     }
     else {
       array.splice(i, 1);
+      return i;
     }
+    return i;
+
   }
 
   let double_next = (array, i, set) => {
     if (array[i + 1] != undefined) {
       if (!set.has(array[i + 1])) {
-        array[i] = array[i+1]; 
+        array[i] = array[i+1];
+        return i + 1;
       }
       else {
         array.splice(i, 1);
+        return i;
       }
     }
     else {
       array.splice(i, 1);
+      return i;
     }
+    return i;
+
   }
 
   let double_prev = (array, i, set) => {
     if (array[i - 1] != undefined) {
       if (!set.has(array[i - 1])) {
         array[i] = array[i-1];
+        return i + 1;
       }
       else {
       array.splice(i, 1);
+      return i;
       }
     }
     else {
       array.splice(i, 1);
+      return i;      
     }
+    return i;
+
   }
 
   if (!Array.isArray(arr)) throw Error;
@@ -69,22 +92,26 @@ module.exports = function transform(arr) {
   for (let i = 0; i < arr.length; i++) {
     newArr.push(arr[i]);
   }
-  for (let i = 0; i < newArr.length; i++) {
-    if (set.has(arr[i])) {
-      if (arr[i] === '--discard-next') discard_next(newArr, i, set);
-      if (arr[i] === '--discard-prev') discard_prev(newArr, i, set);
-      if (arr[i] === '--double-next') double_next(newArr, i, set);
-      if (arr[i] === '--double-prev') double_prev(newArr, i, set);
+
+  let i = 0;
+  while(i < newArr.length) {
+    if (set.has(newArr[i])) {
+      if (newArr[i] === '--discard-next') i = discard_next(newArr, i, set);
+      if (newArr[i] === '--discard-prev') i = discard_prev(newArr, i, set);
+      if (newArr[i] === '--double-next') i = double_next(newArr, i, set);
+      if (newArr[i] === '--double-prev') i = double_prev(newArr, i, set);
+    }
+    else {
+      i++;
     }
   }
+  
   for (let i = 0; i < newArr.length; i++) {
     if (newArr[i] === '--') {
         newArr.splice(i, 1);
         i--;
     }
-
   }
   return newArr;
 };
-
 
